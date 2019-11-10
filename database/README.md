@@ -4,7 +4,9 @@ PostgreSQL database is used store the Event Registration Data.
 
 ## Tables
 
-<iframe width="560" height="315" src='https://dbdiagram.io/embed/5dc77bbdedf08a25543dbaca'> </iframe>
+<img src="https://dbdiagram.io/embed/5dc77bbdedf08a25543dbaca"
+     alt="Markdown Monster icon"
+     style="float: left; margin-right: 10px;" />
 
 ### Person
 
