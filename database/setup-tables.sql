@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS Users CASCADE;
 CREATE TABLE Users (
-    UserId int SERIAL,
+    UserId SERIAL,
     LastName varchar(255),
     FirstName varchar(255),
     Email varchar(255),
@@ -11,7 +11,7 @@ CREATE TABLE Users (
 
 DROP TABLE IF EXISTS Events CASCADE;
 CREATE TABLE Events (
-    EventId int SERIAL,
+    EventId SERIAL,
     Description varchar(255),
     StartData date,
     EndData date, 
@@ -24,7 +24,7 @@ CREATE TABLE Register (
     UserId int,
     EventId int,
     PRIMARY KEY (UserId, EventId),
-    FOREIGN KEY (UserId) REFERENCES Person (UserId),
+    FOREIGN KEY (UserId) REFERENCES Users (UserId),
     FOREIGN KEY (EventId) REFERENCES Events (EventId) 
 );
 

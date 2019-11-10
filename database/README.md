@@ -4,9 +4,7 @@ PostgreSQL database is used store the Event Registration Data.
 
 ## Tables
 
-<img src="https://dbdiagram.io/embed/5dc77bbdedf08a25543dbaca"
-     alt="Markdown Monster icon"
-     style="float: left; margin-right: 10px;" />
+![](images/ER-diagram.png)
 
 ### Person
 
@@ -65,5 +63,6 @@ psql event-registration -f setup-tables.sql
 
 ```
 psql event-registration
-
 ```
+
+Create the tables using the commands in [setup-tables.sql](setup-tables.sql)
