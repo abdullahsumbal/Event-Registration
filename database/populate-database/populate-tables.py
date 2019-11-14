@@ -45,7 +45,7 @@ def populate (conn):
 
     # populate events
     for event in events:
-        insert_statement = f"insert into Events (Description, StartDate, EndDate, Picture) values ( '{event['Description']}', '{event['StartDate']}', '{event['EndDate']}','{event['Picture']}');"
+        insert_statement = f"insert into Events (EventName, Description, StartDate, EndDate, Picture) values ( '{event['EventName']}','{event['Description']}', '{event['StartDate']}', '{event['EndDate']}','{event['Picture']}');"
         print(insert_statement)
         cur.execute(insert_statement)
     cur.execute("select * from Events;")

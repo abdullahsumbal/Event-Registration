@@ -12,6 +12,7 @@ CREATE TABLE Users (
 DROP TABLE IF EXISTS Events CASCADE;
 CREATE TABLE Events (
     EventId SERIAL,
+    EventName varchar(255),
     Description varchar(255),
     StartDate date,
     EndDate date, 

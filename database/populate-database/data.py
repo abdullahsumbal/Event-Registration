@@ -3,7 +3,7 @@ from datetime import datetime
 events = [
     {
         'EventId': 1,
-        'Name': 'Superman Show',
+        'EventName': 'Superman Show',
         'Description': 'Come meet superman and have fun',
         'StartDate' : datetime.now(), 
         'EndDate' : datetime.now() ,
