@@ -66,3 +66,8 @@ psql event-registration
 ```
 
 Create the tables using the commands in [setup-tables.sql](setup-tables.sql)
+
+## Notes:
+
+1. Curerntly, I am listening to any IP that wants to connect to my database. Need to change that in the future.
+2.
