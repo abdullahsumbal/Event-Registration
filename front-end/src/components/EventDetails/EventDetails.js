@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 class EventDetails extends Component {
-  state = { event: {} };
+  state = { event: {}, users: [] };
 
   controller = new AbortController();
 
-  componentWillReceiveProps(nextProps) {
-    // fetch return promises
-    if (nextProps.showDetails) {
-      this.fetchEventDetails();
-    }
+  componentWillMount() {
+    this.fetchEventDetails();
   }
 
   componentWillUnmount() {
@@ -20,19 +17,38 @@ class EventDetails extends Component {
     return response.json();
   };
 
-  fetchEventDetails = () => {
-    fetch(this.props.uri, { signal: this.controller.signal })
+  fetchRegisteredUsers = () => {
+    fetch(this.props.uri_users, {
+      signal: this.controller.signal
+    })
       // handle network err/success
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        console.log(json.event);
-        this.setState({ event: json.event[0] });
+        this.setState({ users: json.users });
       })
       // handle fetch Promise error
       .catch(error => {
         console.log(error);
-        alert(error.message);
+        // alert(error.message);
+      });
+  };
+
+  fetchEventDetails = () => {
+    fetch(this.props.uri_event, {
+      signal: this.controller.signal
+    })
+      // handle network err/success
+      .then(this.handleErrors)
+      // use response of network on fetch Promise resolve
+      .then(json => {
+        this.setState({ event: json.event[0] });
+        this.fetchRegisteredUsers();
+      })
+      // handle fetch Promise error
+      .catch(error => {
+        console.log(error);
+        // alert(error.message);
       });
   };
   render() {
@@ -43,7 +59,7 @@ class EventDetails extends Component {
       enddate,
       picture
     } = this.state.event;
-    return this.props.showDetails ? (
+    return (
       <div>
         <hr />
         Name: {eventname} <br />
@@ -51,11 +67,13 @@ class EventDetails extends Component {
         Start Date: {startdate} <br />
         End Date: {enddate}
         <br />
-        Picture: {picture}
+        Picture: {picture} <br />
+        Users:
+        {this.state.users.map(user => (
+          <div key={user.userid}>{user.firstname + " " + user.lastname}</div>
+        ))}
         <hr />
       </div>
-    ) : (
-      <div></div>
     );
   }
 }
