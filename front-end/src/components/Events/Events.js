@@ -5,16 +5,19 @@ class Event extends Component {
   state = { showDetails: false };
 
   toggleDetails = () => {
-    // may be I can fetch details here
     this.setState({ showDetails: !this.state.showDetails });
   };
 
   render() {
-    const { eventname, uri } = this.props.event;
+    const { eventname, uri_event, uri_users } = this.props.event;
+    let renderEventDetails = this.state.showDetails ? (
+      <EventDetails uri_event={uri_event} uri_users={uri_users} />
+    ) : null;
+    // console.log(renderEventDetails)
     return (
       <>
         <div onClick={this.toggleDetails}>{eventname}</div>
-        <EventDetails showDetails={this.state.showDetails} uri={uri} />
+        {renderEventDetails}
       </>
     );
   }
@@ -36,19 +39,19 @@ class Events extends Component {
   }
 
   handleErrors = response => {
+    // console.log(response);
     if (!response.ok) throw Error(response.statusText);
     return response.json();
   };
 
   fetchEvents = () => {
-    fetch("http://localhost:5000/api/events", {
+    fetch("http://localhost:5000/api/v1/events", {
       signal: this.controller.signal
     })
       // handle network err/success
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        console.log(json);
         this.setState({ events: json.events });
       })
       // handle fetch Promise error
@@ -70,7 +73,7 @@ class Events extends Component {
     return (
       <div>
         {this.state.events.map(event => (
-          <Event key={event.uri} event={event} />
+          <Event key={event.eventid} event={event} />
         ))}
         {showDetail}
       </div>
