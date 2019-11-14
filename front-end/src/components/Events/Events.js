@@ -1,13 +1,5 @@
 import React, { Component } from "react";
-
-// const Event = ({ event }) => {
-//   const { setup, punchline } = event;
-//   return (
-//     <div>
-//       {setup} {punchline}
-//     </div>
-//   );
-// };
+import EventDetails from "../EventDetails/EventDetails";
 
 class Event extends Component {
   state = { showDetails: false };
@@ -18,23 +10,11 @@ class Event extends Component {
   };
 
   render() {
-    const { id, setup, punchline } = this.props.event;
-    let addDetails = this.state.showDetails ? (
-      <div>
-        <hr />
-        Name: {id} <br />
-        Event Name: yolo
-        <hr />
-      </div>
-    ) : (
-      <div></div>
-    );
+    const { eventname, uri } = this.props.event;
     return (
       <>
-        <div onClick={this.toggleDetails}>
-          {setup} {punchline}
-        </div>
-        {addDetails}
+        <div onClick={this.toggleDetails}>{eventname}</div>
+        <EventDetails showDetails={this.state.showDetails} uri={uri} />
       </>
     );
   }
@@ -42,6 +22,7 @@ class Event extends Component {
 
 class Events extends Component {
   state = { events: [], showEvent: -1 };
+  controller = new AbortController();
 
   // better practice to handle async code in
   // in this function
@@ -50,22 +31,29 @@ class Events extends Component {
     this.fetchEvents();
   }
 
+  componentWillUnmount() {
+    this.controller.abort();
+  }
+
   handleErrors = response => {
     if (!response.ok) throw Error(response.statusText);
     return response.json();
   };
 
   fetchEvents = () => {
-    fetch("https://official-joke-api.appspot.com/random_ten")
+    fetch("http://localhost:5000/api/events", {
+      signal: this.controller.signal
+    })
       // handle network err/success
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
         console.log(json);
-        this.setState({ events: json });
+        this.setState({ events: json.events });
       })
       // handle fetch Promise error
       .catch(error => {
+        console.log(error);
         alert(error.message);
       });
   };
@@ -82,7 +70,7 @@ class Events extends Component {
     return (
       <div>
         {this.state.events.map(event => (
-          <Event key={event.id} event={event} />
+          <Event key={event.uri} event={event} />
         ))}
         {showDetail}
       </div>

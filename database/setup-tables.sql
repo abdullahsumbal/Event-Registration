@@ -12,9 +12,10 @@ CREATE TABLE Users (
 DROP TABLE IF EXISTS Events CASCADE;
 CREATE TABLE Events (
     EventId SERIAL,
+    EventName varchar(255),
     Description varchar(255),
-    StartData date,
-    EndData date, 
+    StartDate date,
+    EndDate date, 
     Picture varchar(255),
     PRIMARY KEY (EventId)
 );
