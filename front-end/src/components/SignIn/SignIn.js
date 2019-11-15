@@ -61,6 +61,7 @@ class SignIn extends Component {
     // but you don't need to target those (any css-selector will work)
     return (
       <div>
+        <h4>Login</h4>
         <form onSubmit={this.handleSubmit}>
           {this.state.error && (
             <h3 data-test="error" onClick={this.dismissError}>
@@ -74,7 +75,7 @@ class SignIn extends Component {
             value={this.state.email}
             onChange={this.handleUserChange}
           />
-
+          <br />
           <label>Password</label>
           <input
             type="password"

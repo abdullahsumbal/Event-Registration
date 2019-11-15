@@ -39,11 +39,14 @@ class Event extends Component {
 
     // render EventDetails only when user clicks on the event
     return (
-      <>
-        <div onClick={this.toggleDetails}>{eventname}</div>
+      <div style={{ marginBottom: 10 }}>
+        <div onClick={this.toggleDetails}>
+          {this.props.index + 1 + ". " + eventname}
+        </div>
         <button onClick={this.registerUser}> Register</button>
         {renderEventDetails}
-      </>
+        <hr />
+      </div>
     );
   }
 }
@@ -87,20 +90,12 @@ class Events extends Component {
   };
 
   render() {
-    // Ask user to select an event to show details
-    // by default I am not showing any details.
-    let showDetail = <div>No Event</div>;
-    if (this.state.showEvent < 0) {
-      showDetail = <div>Select an Event to Show Detail</div>;
-    } else {
-      showDetail = <div>Showing Details for {this.state.showEvent}</div>;
-    }
     return (
       <div>
-        {this.state.events.map(event => (
-          <Event key={event.eventid} event={event} />
+        <h4>Event Listing</h4>
+        {this.state.events.map((event, index) => (
+          <Event key={index} index={index} event={event} />
         ))}
-        {showDetail}
       </div>
     );
   }

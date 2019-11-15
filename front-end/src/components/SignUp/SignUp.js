@@ -78,6 +78,7 @@ class SignUp extends Component {
     const { email, password, firstname, lastname, error } = this.state;
     return (
       <div>
+        <h4>Sign Up</h4>
         <form onSubmit={this.handleSubmit}>
           {this.state.error && (
             <h3 data-test="error" onClick={this.dismissError}>

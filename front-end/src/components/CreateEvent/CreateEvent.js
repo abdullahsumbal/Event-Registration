@@ -31,8 +31,7 @@ class CreateEvent extends Component {
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        //TODO: show notice
-        // this.setState({ events: json.events });
+        alert(json.message);
       })
       // handle fetch Promise error
       .catch(error => {
@@ -99,6 +98,7 @@ class CreateEvent extends Component {
     // but you don't need to target those (any css-selector will work)
     return (
       <div>
+        <h4>Create Event</h4>
         <form onSubmit={this.handleSubmit}>
           {this.state.error && (
             <h3 data-test="error" onClick={this.dismissError}>
@@ -146,7 +146,7 @@ class CreateEvent extends Component {
             onChange={this.onChange}
           />
 
-          <input type="submit" value="Log In" data-test="submit" />
+          <input type="submit" value="Create Event" data-test="submit" />
         </form>
       </div>
     );

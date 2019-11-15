@@ -19,6 +19,7 @@ const Header = ({ children }) => {
           <Link to="/signup">Sign Up</Link>
         </h3>
       </div>
+      <hr />
       {children}
     </div>
   );

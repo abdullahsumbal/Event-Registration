@@ -8,6 +8,9 @@ The application allows user to view, create and register for events.
 2. User must be logged in to create events.
 3. A user can only register to an event once.
 4. User can not change profile information
+5. User must provide all the info to sign up and same goes for events.
+
+## 6. No styling is better than no styling
 
 ## Components:
 
