@@ -4,6 +4,8 @@ import ErrorHandler from "./ErrorHandler/ErrorHandler";
 import { Router, Switch, Route } from "react-router-dom";
 import { createBrowserHistory as createHistory } from "history";
 import Header from "./Header/Header";
+import SignIn from "./SignIn/SignIn";
+import SignUp from "./SignUp/SignUp";
 
 class App extends Component {
   render() {
@@ -26,6 +28,24 @@ class App extends Component {
               render={() => (
                 <Header>
                   <Events />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/login"
+              render={() => (
+                <Header>
+                  <SignIn />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/signup"
+              render={() => (
+                <Header>
+                  <SignUp />
                 </Header>
               )}
             ></Route>

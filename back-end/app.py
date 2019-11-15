@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(app, support_credentials=True, resources={r"/api": {"origins": "localhost:1234"}})
+cors = CORS(app)
 # global object Flask uses for passing information to views/modules.
 db = {'connect': None}
 
@@ -111,16 +111,15 @@ def get_registered_users(event_id):
 
 
 @app.route('/api/v1/user', methods=['GET'])
-@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
 def create_user():
+    """Get all the events"""
+    cur = get_cursor()
+    cur.execute("select EventId, EventName from Events")
+    events = add_descrption(cur.fetchall(), cur.description)
+    if len(events) == 0:
+        abort(404)
+    return jsonify({'events': events})
 
-    must_haves = ['lastname', 'firstname', 'email', 'password']
-    print(request)
-    print([must_have for must_have in request.form])
-    print(request.form['firstname'])
-    print(all(must_have in request.form for must_have in must_haves))
-    sys.stdout.flush()
-    return jsonify({'message': 'created user' }), 201
 
     # if not request.form or not all(must_have in request.form for must_have in must_haves):
     #     abort(400)

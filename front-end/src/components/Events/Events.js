@@ -45,7 +45,7 @@ class Events extends Component {
   };
 
   fetchEvents = () => {
-    fetch("http://localhost:5000/api/v1/events", {
+    fetch("https://eventregistrationapi.herokuapp.com/api/v1/events", {
       signal: this.controller.signal
     })
       // handle network err/success

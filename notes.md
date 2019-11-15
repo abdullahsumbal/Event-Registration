@@ -9,3 +9,8 @@ backend.js:6 Warning: Can't perform a React state update on an unmounted compone
     in div (created by Header)
     in Header (created by Route)
 ```
+
+3. separate repo, but got no time
+
+4. key react
+5.
