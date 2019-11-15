@@ -113,8 +113,9 @@ def create_event():
     """Get all the events"""
     # return jsonify({'message': 'created event' }), 201
     must_haves = ["eventname", "description", "startdate", "enddate", "picture"] 
-    cur = get_cursor() 
-    if not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves):
+    # validation of incoming data
+    # make sure mush have attributes are and their values are not empty 
+    if has_key_and_values(must_haves, request):
         abort(400)
     args = request.form
 
@@ -123,14 +124,13 @@ def create_event():
         cur.execute("""INSERT INTO events (eventname, description, startdate, enddate, picture) VALUES (%s, %s, %s, %s, %s)""", (args["eventname"], args["description"], toDate(args["startdate"]), toDate(args["enddate"]), args["picture"]))
         db["connect"].commit()
         cur.close()
-    except Exception as e:
-        print(e)
+    except Exception:
         cur.close()
         abort(500)
     
     cur.close()
 
-    return jsonify({'message': 'created user' }), 201
+    return jsonify({'message': 'Event Created' }), 201
 
 ########################################################
 #                   Register Requests            
@@ -186,7 +186,7 @@ def create_user():
     cur = get_cursor() 
 
     ## make sure we have all the attributes from the client
-    if not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves):
+    if has_key_and_values(must_haves, request):
         abort(400)
     args = request.form
     cur = get_cursor()
@@ -233,6 +233,10 @@ def create_user():
 ########################################################
 #                   helper function          
 ########################################################
+
+def has_key_and_values(must_haves, request):
+    return not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves)
+
 
 def toDate(dateString): 
     return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
