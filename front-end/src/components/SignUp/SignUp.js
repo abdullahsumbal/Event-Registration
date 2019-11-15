@@ -22,7 +22,7 @@ class SignUp extends Component {
 
   fetchEvents = evt => {
     const data = new FormData(evt.target);
-    fetch("https://eventregistrationapi.herokuapp.com/api/v1/user", {
+    fetch("http://localhost:5000/api/v1/user", {
       method: "POST",
       body: data
     })

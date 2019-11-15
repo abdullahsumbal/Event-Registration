@@ -6,6 +6,7 @@ import { createBrowserHistory as createHistory } from "history";
 import Header from "./Header/Header";
 import SignIn from "./SignIn/SignIn";
 import SignUp from "./SignUp/SignUp";
+import CreateEvent from "./CreateEvent/CreateEvent";
 
 class App extends Component {
   render() {
@@ -16,15 +17,6 @@ class App extends Component {
             <Route
               exact
               path="/"
-              render={() => (
-                <Header>
-                  <Events />
-                </Header>
-              )}
-            ></Route>
-            <Route
-              exact
-              path="/create"
               render={() => (
                 <Header>
                   <Events />
@@ -46,6 +38,15 @@ class App extends Component {
               render={() => (
                 <Header>
                   <SignUp />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/create"
+              render={() => (
+                <Header>
+                  <CreateEvent />
                 </Header>
               )}
             ></Route>

@@ -8,6 +8,8 @@ class Event extends Component {
     this.setState({ showDetails: !this.state.showDetails });
   };
 
+  registerUser = () => {};
+
   render() {
     const { eventname, uri_event, uri_users } = this.props.event;
     let renderEventDetails = this.state.showDetails ? (
@@ -17,6 +19,7 @@ class Event extends Component {
     return (
       <>
         <div onClick={this.toggleDetails}>{eventname}</div>
+        <button onClick={this.registerUser}> Register</button>
         {renderEventDetails}
       </>
     );
@@ -45,7 +48,7 @@ class Events extends Component {
   };
 
   fetchEvents = () => {
-    fetch("https://eventregistrationapi.herokuapp.com/api/v1/events", {
+    fetch("http://localhost:5000/api/v1/event", {
       signal: this.controller.signal
     })
       // handle network err/success
