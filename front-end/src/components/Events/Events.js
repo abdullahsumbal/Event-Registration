@@ -8,7 +8,20 @@ class Event extends Component {
     this.setState({ showDetails: !this.state.showDetails });
   };
 
-  registerUser = () => {};
+  registerUser = () => {
+    fetch(this.props.event.uri_register + "/3", {
+      method: "POST"
+    })
+      // handle network err/success
+      .then(this.handleErrors)
+      // use response of network on fetch Promise resolve
+      .then(json => {})
+      // handle fetch Promise error
+      .catch(error => {
+        console.log(error);
+        alert(error.message);
+      });
+  };
 
   render() {
     const { eventname, uri_event, uri_users } = this.props.event;

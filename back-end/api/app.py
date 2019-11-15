@@ -125,14 +125,14 @@ def get_registered_users(event_id):
     #     abort(404)
     return jsonify({'users': users})
 
-# @app.route('/api/v1/register/<int:event_id>/<int:user_id>', methods=['Post'])
-# def register_user_to_event(event_id, user_id):
-#     """ Register user to an event"""
-#     cur = get_cursor()
-#     cur.execute("insert into register (userid, eventid) values (%s, %s)", [user_id, event_id])
-#     # if len(users) == 0:
-#     #     abort(404)
-#     return jsonify({'message': 'registered user' }), 201
+@app.route('/api/v1/register/<int:event_id>/<int:user_id>', methods=['Post'])
+def register_user_to_event(event_id, user_id):
+    """ Register user to an event"""
+    cur = get_cursor()
+    cur.execute("insert into register (userid, eventid) values (%s, %s)", [user_id, event_id])
+    # if len(users) == 0:
+    #     abort(404)
+    return jsonify({'message': 'registered user' }), 201
 
 
 ########################################################
@@ -193,7 +193,7 @@ def add_descrption(rows, discription):
             if 'eventid' in col_name:
                 new_row['uri_event'] = url_for('get_event', event_id=col_value, _external=True)
                 new_row['uri_users'] = url_for('get_registered_users', event_id=col_value, _external=True)
-                # new_row['uri_register'] = url_for('register_user_to_event', event_id=col_value, _external=True)
+                new_row['uri_register'] = url_for('get_registered_users', event_id=col_value, _external=True)
             new_row[col_name] = col_value
         response.append(new_row)
     return response
