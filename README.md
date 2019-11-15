@@ -19,7 +19,7 @@ The application allows user to view, create and register for events.
 
 ## Database
 
-Location: [back-end/database](back-end/database)
+### directpory Location: [back-end/database](back-end/database)
 
 Inside this folder you will find
 
@@ -30,19 +30,19 @@ Inside this folder you will find
 
 ### Important Points
 
-### How does my Schema look like?
+#### 1. How does my Schema look like?
 
 [back-end/database/README.md](back-end/database/README.md)
 
-#### Where is the database running?
+#### 2. Where is the database running?
 
 I have a digital Ocean server.
 
-#### How to do I setup my tables?
+#### 3. How to do I setup my tables?
 
 I set up the database usign the script called [setup-tables.sql](back-end/database/setup-tables.sql).
 
-#### How Do I populate my tables?
+#### 4. How Do I populate my tables?
 
 I have to python script called [populate-tables.py](back-end/database/setup-tables.sql/populate-database/populate-tables.py) that adds users and events and their relation from a from a file called [data.py](back-end/database/populate-database/data.py). Database authentication information is stored in [database-template.ini](back-end/database/populate-database/database-template.ini).
 
