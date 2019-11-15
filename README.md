@@ -78,7 +78,7 @@ API should be up and running on [https://eventregistrationapi.herokuapp.com/](ht
    /api/v1/event/<int:event_id>
    ```
 
-#### 3. Regsiter Request
+#### 3. Register Request
 
 1. Get Registered User given Event id (GET)
    ```
@@ -121,3 +121,125 @@ def service_down(error):
 #### 3. What can I improve
 
     Alot of things
+
+    1. form validation on the backend side
+    2. database use models
+    3. database migration
+    4.
+
+## Front-End
+
+### Important points:
+
+#### 1. Directory Setup
+
+```
+index.html
+index.js
+src
+├───assests
+└───components
+    ├───CreateEvent
+    ├───ErrorHandler
+    ├───EventDetails
+    ├───Events
+    ├───Header
+    ├───SignIn
+    └───SignUp
+```
+
+#### 2. Other important files:
+
+1. package.json: contains dependencies and strips to run (parcel)
+
+```
+babel
+const element = <div>React element in JSX!</div> ==> var element = React.createElement("div", null, "React element in JSX!");
+```
+
+2. .babelrc: tells babel what to use to compiling.
+
+#### 3. Event (Home Page)
+
+Events ==> Event ==> EventDetails
+
+async calls are made when the home page (Events component) is mounted. Call is made in the `componentDidMount`.
+
+Event shows Names of Events and register button
+
+EventDetails, which is a child of Event, makes async calls to get Event Details and user which are registered for the Parent Event. This
+
+#### 4. ErrorHandler
+
+Wraps everything around it.
+
+#### 5. Routing
+
+Header applied to as the parent to every page (component)
+
+```
+      <Router history={createHistory()}>
+        <Switch>
+          <ErrorHandler>
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <Header>
+                  <Events />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/login"
+              render={() => (
+                <Header>
+                  <SignIn />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/signup"
+              render={() => (
+                <Header>
+                  <SignUp />
+                </Header>
+              )}
+            ></Route>
+            <Route
+              exact
+              path="/create"
+              render={() => (
+                <Header>
+                  <CreateEvent />
+                </Header>
+              )}
+            ></Route>
+          </ErrorHandler>
+        </Switch>
+      </Router>
+```
+
+#### 6. Sign in, Sign Up and Create Page Handling
+
+#### 7. What can I improve
+
+    1.  add styling
+
+## Error
+
+1. Error: Database connection
+
+```
+Access to fetch at 'http://localhost:5000/api/v1/register/1' from origin 'http://localhost:1234' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+```
+
+2. Cancel rendering of unmounted component using `controller = new AbortController();`
+
+```
+Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+
+```
