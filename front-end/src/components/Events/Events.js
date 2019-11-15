@@ -28,7 +28,8 @@ class Event extends Component {
     let renderEventDetails = this.state.showDetails ? (
       <EventDetails uri_event={uri_event} uri_users={uri_users} />
     ) : null;
-    // console.log(renderEventDetails)
+
+    // render EventDetails only when user clicks on the event
     return (
       <>
         <div onClick={this.toggleDetails}>{eventname}</div>

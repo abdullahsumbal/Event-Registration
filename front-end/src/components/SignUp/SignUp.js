@@ -20,7 +20,7 @@ class SignUp extends Component {
     return response.json();
   };
 
-  fetchEvents = evt => {
+  signUpUser = evt => {
     const data = new FormData(evt.target);
     fetch("http://localhost:5000/api/v1/user", {
       method: "POST",
@@ -30,15 +30,17 @@ class SignUp extends Component {
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        // this.setState({ events: json.events });
+        // TODO: Somthing here
       })
       // handle fetch Promise error
       .catch(error => {
-        console.log(error);
         alert(error.message);
       });
   };
 
+  // Some validaton for fields.
+  // Something is wrong update error state
+  // If everthing is already send request to sign up user
   handleSubmit = evt => {
     evt.preventDefault();
 
@@ -60,7 +62,7 @@ class SignUp extends Component {
 
     this.setState({ error: "" });
     // send post request
-    this.fetchEvents(evt);
+    this.signUpUser(evt);
   };
 
   onChange = evt => {
@@ -74,8 +76,6 @@ class SignUp extends Component {
 
   render() {
     const { email, password, firstname, lastname, error } = this.state;
-    // NOTE: I use data-attributes for easier E2E testing
-    // but you don't need to target those (any css-selector will work)
     return (
       <div>
         <form onSubmit={this.handleSubmit}>

@@ -5,7 +5,27 @@ class EventDetails extends Component {
   controller = new AbortController();
 
   componentWillMount() {
+    // Frist:
     this.fetchEventDetails();
+
+    // Second Way
+    // Promise.all([
+    //   fetch(this.props.uri_event, {
+    //     signal: this.controller.signal
+    //   }),
+    //   fetch(this.props.uri_users, {
+    //     signal: this.controller.signal
+    //   })
+    // ])
+    //   .then(([res1, res2]) =>
+    //     Promise.all([this.handleErrors(res1), this.handleErrors(res2)])
+    //   )
+    //   .then(([data1, data2]) =>
+    //     this.setState({
+    //       event: data1.event[0],
+    //       users: data2.users
+    //     })
+    //   );
   }
 
   componentWillUnmount() {

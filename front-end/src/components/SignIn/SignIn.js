@@ -7,6 +7,24 @@ class SignIn extends Component {
     error: ""
   };
 
+  logInUser = evt => {
+    const data = new FormData(evt.target);
+    fetch("http://localhost:5000/api/v1/login", {
+      method: "POST",
+      body: data
+    })
+      // handle network err/success
+      .then(this.handleErrors)
+      // use response of network on fetch Promise resolve
+      .then(json => {
+        // TODO: if okay go something
+      })
+      // handle fetch Promise error
+      .catch(error => {
+        alert(error.message);
+      });
+  };
+
   dismissError = () => {
     this.setState({ error: "" });
   };
@@ -21,8 +39,9 @@ class SignIn extends Component {
     if (!this.state.password) {
       return this.setState({ error: "Password is required" });
     }
-    console.log(this.state.error);
-    return this.setState({ error: "" });
+
+    this.setState({ error: "" });
+    this.logInUser(evt);
   };
 
   handleUserChange = evt => {

@@ -41,6 +41,8 @@ class CreateEvent extends Component {
       });
   };
 
+  // Some validaton for fields.
+  // Something is wrong update error state
   handleSubmit = evt => {
     evt.preventDefault();
     const {
@@ -78,11 +80,9 @@ class CreateEvent extends Component {
   };
 
   onChange = evt => {
-    /*
-      Because we named the inputs to match their
-      corresponding values in state, it's
-      super easy to update the state
-    */
+    // Because we named the inputs to match their
+    // corresponding values in state, it's
+    // super easy to update the state
     this.setState({ [evt.target.name]: evt.target.value });
   };
 
