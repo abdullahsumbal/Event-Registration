@@ -8,6 +8,12 @@ class Event extends Component {
     this.setState({ showDetails: !this.state.showDetails });
   };
 
+  handleErrors = response => {
+    // console.log(response);
+    if (!response.ok) throw Error(response.statusText);
+    return response.json();
+  };
+
   registerUser = () => {
     fetch(this.props.event.uri_register + "/3", {
       method: "POST"
@@ -15,7 +21,9 @@ class Event extends Component {
       // handle network err/success
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
-      .then(json => {})
+      .then(json => {
+        alert(json.message);
+      })
       // handle fetch Promise error
       .catch(error => {
         console.log(error);

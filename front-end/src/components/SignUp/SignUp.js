@@ -30,7 +30,7 @@ class SignUp extends Component {
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        // TODO: Somthing here
+        alert(json.message);
       })
       // handle fetch Promise error
       .catch(error => {
@@ -117,7 +117,7 @@ class SignUp extends Component {
             onChange={this.onChange}
           />
 
-          <input type="submit" value="Log In" data-test="submit" />
+          <input type="submit" value="Log Up" data-test="submit" />
         </form>
       </div>
     );
