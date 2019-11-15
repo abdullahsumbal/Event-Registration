@@ -6,7 +6,8 @@ CREATE TABLE Users (
     Email varchar(255),
     Password varchar(255),
     SignUpDate date Default current_timestamp,
-    PRIMARY KEY (UserId)
+    PRIMARY KEY (UserId),
+    UNIQUE (Email)
 );
 
 DROP TABLE IF EXISTS Events CASCADE;

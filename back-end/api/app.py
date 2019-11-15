@@ -4,14 +4,19 @@ import psycopg2
 import datetime
 from database import connect_db
 from flask_httpauth import HTTPBasicAuth
+from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
+from passlib.hash import pbkdf2_sha256 as sha256
 from flask import Flask, jsonify, abort, make_response, request, url_for
+from flask_jwt_extended import (create_access_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
 app = Flask(__name__)
-
+app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+jwt = JWTManager(app)
 cors = CORS(app)
+
 # global object Flask uses for passing information to views/modules.
 db = {'connect': None}
 db['connect'] = connect_db()
@@ -26,16 +31,7 @@ def hello():
     <h1>Hello</h1>
     <p> This is the event registraiton API</p>
     """
-
-########################################################
-#             HTTPBasicAuth            
-########################################################
-@app.route('/api/v1/login', methods=['POST'])
-@cross_origin()
-def login_user():
-    """Get all the events"""
-    return jsonify({'message': 'login user' }), 200
-
+        
 ########################################################
 #             Before and After request            
 ########################################################
@@ -73,10 +69,43 @@ def service_down(error):
     """ Error handler for 503 error. Used for database"""
     return make_response(jsonify({'error': 'Unable to Connect to Database'}), 503)
 
-# @auth.error_handler
-# def unauthorized():
-#     """ Error handling for authication"""
-#     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+@app.errorhandler(401)
+def unauthorized():
+    """ Error handling for authication"""
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+
+
+########################################################
+#             HTTPBasicAuth            
+########################################################
+
+@app.route('/api/v1/login', methods=['POST'])
+@cross_origin()
+def login_user():
+    """Login user. function uses hash to verify the password and provide token"""
+ 
+    # validation of incoming data
+    # make sure mush have attributes are and their values are not empty 
+    must_haves = ["email", "password"] 
+    print(request.form)
+    sys.stdout.flush()
+    if has_key_and_values(must_haves, request):
+        abort(400)
+
+    # check if the user email exists
+    args = request.form
+    cur = get_cursor()
+    cur.execute("select password from users where email=%s", (args["email"],))
+    should_be_password = cur.fetchall()
+    if len(should_be_password) == 0: # user email does not exist
+        cur.close()
+        return jsonify({'message': 'Incorrect Username or password' }), 200
+    elif (verify_hash(args["password"], should_be_password[0][0])): # user email does exist
+        access_token = create_access_token(identity = args['email']) # creating acces token
+        return jsonify({'message': 'User logged in', 'access_token': access_token }), 200
+    else: # password does not match
+        return jsonify({'message': 'Password does not match' }), 200
+
 
 ########################################################
 #                   Event Requests            
@@ -90,8 +119,8 @@ def get_events():
     cur.execute("select EventId, EventName from Events")
     events = add_descrption(cur.fetchall(), cur.description)
     cur.close()
-    if len(events) == 0:
-        abort(404)
+    # if len(events) == 0:
+    #     return jsonify({'events': events})
     return jsonify({'events': events})
 
 
@@ -107,18 +136,19 @@ def get_event(event_id):
         abort(404)
     return jsonify({'event': event})
 
+
 @app.route('/api/v1/event', methods=['POST'])
 @cross_origin()
 def create_event():
     """Get all the events"""
-    # return jsonify({'message': 'created event' }), 201
-    must_haves = ["eventname", "description", "startdate", "enddate", "picture"] 
+
     # validation of incoming data
     # make sure mush have attributes are and their values are not empty 
+    must_haves = ["eventname", "description", "startdate", "enddate", "picture"] 
     if has_key_and_values(must_haves, request):
         abort(400)
-    args = request.form
 
+    args = request.form
     cur = get_cursor()
     try: 
         cur.execute("""INSERT INTO events (eventname, description, startdate, enddate, picture) VALUES (%s, %s, %s, %s, %s)""", (args["eventname"], args["description"], toDate(args["startdate"]), toDate(args["enddate"]), args["picture"]))
@@ -129,7 +159,6 @@ def create_event():
         abort(500)
     
     cur.close()
-
     return jsonify({'message': 'Event Created' }), 201
 
 ########################################################
@@ -144,17 +173,21 @@ def get_registered_users(event_id):
     cur.execute("select users.userid, users.firstname, users.lastname from users, Register where users.userid = register.userid and eventid = %s", [event_id])
     users = add_descrption(cur.fetchall(), cur.description)
     cur.close()
-    # if len(users) == 0:
-    #     abort(404)
     return jsonify({'users': users})
 
-@app.route('/api/v1/register/<int:event_id>/<int:user_id>', methods=['Post'])
+
+@app.route('/api/v1/register/<int:event_id>', methods=['Post'])
 @cross_origin()
-def register_user_to_event(event_id, user_id):
+@jwt_required 
+def register_user_to_event(event_id):
     """ Register user to an event"""
     cur = get_cursor()
-
+    user_email = get_jwt_identity()
+    cur.execute("select userid from users where email=%s", (user_email,) )
+    user_id = cur.fetchone()
+    user_id = user_id[0] if len(user_id) > 0 else abort(403)
     try:
+
         # make sure user is not already registered for the given event
         cur.execute("""select userid from register where userid=%s and eventid=%s""",(user_id, event_id,))
         user = cur.fetchall()
@@ -199,9 +232,10 @@ def create_user():
         user = cur.fetchall()
         if len(user) > 0:
             return jsonify({'message': 'User already exists' }), 200
-            # Insert user into database
-            cur.execute("""INSERT INTO users (lastname, firstname, email, password) VALUES (%s, %s, %s, %s)""", (args['lastname'], args['firstname'], args['email'], args['password']))
-            db["connect"].commit()
+        # Insert user into database
+        cur.execute("""INSERT INTO users (lastname, firstname, email, password) VALUES (%s, %s, %s, %s)""",
+             (args['lastname'], args['firstname'], args['email'], generate_hash(args['password'])))
+        db["connect"].commit()
     except Exception as e:
         cur.close()
         print(e)
@@ -210,29 +244,19 @@ def create_user():
 
     
     cur.close()
-    return jsonify({'message': 'USer Created' }), 201
-
-
-
-
-
-
-
-    # if not request.form or not all(must_have in request.form for must_have in must_haves):
-    #     abort(400)
-    # args = request.form
-    # print('Insert into Users (lastname, firstname, email, password) values ({}, {}, {}, {})'.format(args['lastname'], args['firstname'], args['email'], args['password']))
-    
-    # sys.stdout.flush()
-    # cur = get_cursor()
-    
-    # cur.execute("Insert into Users (lastname, firstname, email, passowrd) values (%s,%s,%s,%s)", [args['lastname'], args['firstname'], args['email'], args['passowrd']])
-    
-    # return jsonify({'message': 'created user' }), 201
+    return jsonify({'message': 'User Created' }), 201
 
 ########################################################
 #                   helper function          
 ########################################################
+
+def generate_hash(password):
+    return sha256.hash(password)
+
+
+def verify_hash(password, hash):
+    return sha256.verify(password, hash)
+
 
 def has_key_and_values(must_haves, request):
     return not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves)
@@ -241,8 +265,10 @@ def has_key_and_values(must_haves, request):
 def toDate(dateString): 
     return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
 
+
 def get_cursor():
     return db['connect'].cursor() if db['connect'] else abort(503)
+
 
 def add_descrption(rows, discription):
     """ add column name to results"""
@@ -254,7 +280,7 @@ def add_descrption(rows, discription):
             if 'eventid' in col_name:
                 new_row['uri_event'] = url_for('get_event', event_id=col_value, _external=True)
                 new_row['uri_users'] = url_for('get_registered_users', event_id=col_value, _external=True)
-                new_row['uri_register'] = url_for('get_registered_users', event_id=col_value, _external=True)
+                new_row['uri_register'] = url_for('register_user_to_event', event_id=col_value, _external=True)
             new_row[col_name] = col_value
         response.append(new_row)
     return response

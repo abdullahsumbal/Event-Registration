@@ -5,3 +5,5 @@ flask_httpauth
 flask
 flask_cors
 flask_restful 
+passlib
+flask_jwt_extended 
