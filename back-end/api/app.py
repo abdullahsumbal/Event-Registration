@@ -181,6 +181,8 @@ def get_registered_users(event_id):
 @jwt_required 
 def register_user_to_event(event_id):
     """ Register user to an event"""
+
+    # first get user id
     cur = get_cursor()
     user_email = get_jwt_identity()
     cur.execute("select userid from users where email=%s", (user_email,) )

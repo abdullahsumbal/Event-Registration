@@ -117,7 +117,7 @@ class SignUp extends Component {
             onChange={this.onChange}
           />
 
-          <input type="submit" value="Log Up" data-test="submit" />
+          <input type="submit" value="Sign Up" data-test="submit" />
         </form>
       </div>
     );

@@ -12,6 +12,8 @@ The application allows user to view, create and register for events.
 
 ## 6. No styling is better than little styling
 
+7. user will not be automatically signed in after sign up
+
 ## Components:
 
 ### Database (back-end): Postgres
@@ -52,6 +54,7 @@ I have to python script called [populate-tables.py](back-end/database/populate-d
 #### 5. What can I improve
 
 - Indexing
+- email be primary key
 
 ## API
 
