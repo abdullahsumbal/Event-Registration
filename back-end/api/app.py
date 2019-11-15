@@ -16,6 +16,17 @@ cors = CORS(app)
 db = {'connect': None}
 
 ########################################################
+#             API info            
+########################################################
+@app.route('/', methods=['GET'])
+def hello():
+    """Get info"""
+    return """
+    <h1>Hello</h1>
+    <p> This is the event registraiton API</p>
+    """
+
+########################################################
 #             HTTPBasicAuth            
 ########################################################
 # @auth.get_password
