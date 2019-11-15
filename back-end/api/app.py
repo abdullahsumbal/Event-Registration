@@ -14,6 +14,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app)
 # global object Flask uses for passing information to views/modules.
 db = {'connect': None}
+db['connect'] = connect_db()
 
 ########################################################
 #             API info            
@@ -29,11 +30,11 @@ def hello():
 ########################################################
 #             HTTPBasicAuth            
 ########################################################
-# @auth.get_password
-# def get_password(username):
-#     if username == 'miguel':
-#         return 'python'
-#     return None
+@app.route('/api/v1/login', methods=['POST'])
+@cross_origin()
+def login_user():
+    """Get all the events"""
+    return jsonify({'message': 'login user' }), 200
 
 ########################################################
 #             Before and After request            
@@ -42,16 +43,17 @@ def hello():
 @app.before_request
 def before_request():
     """Connect to the database before each request."""
-    db['connect'] = connect_db()
+    # Connectinf to connecting to database here was cauing an error
+    # db['connect'] = connect_db()
+    pass
 
 
 @app.after_request
 def after_request(response):
     """Close the database connection after each request."""
-    if db['connect']:
-        db["connect"].commit()
-        db['connect'].close()
-        print("disconnect from database", flush=True)
+    # if db['connect']:
+    #     db['connect'].close()
+    #     print("disconnect from database", flush=True)
     return response
 
 ########################################################
@@ -81,27 +83,32 @@ def service_down(error):
 ########################################################
 
 @app.route('/api/v1/event', methods=['GET'])
+@cross_origin()
 def get_events():
     """Get all the events"""
     cur = get_cursor()
     cur.execute("select EventId, EventName from Events")
     events = add_descrption(cur.fetchall(), cur.description)
+    cur.close()
     if len(events) == 0:
         abort(404)
     return jsonify({'events': events})
 
 
 @app.route('/api/v1/event/<int:event_id>', methods=['GET'])
+@cross_origin()
 def get_event(event_id):
     """ Get event given id"""
     cur = get_cursor()
     cur.execute("select * from Events where eventid = %s", [event_id])
     event = add_descrption(cur.fetchall(), cur.description)
+    cur.close()
     if len(event) == 0:
         abort(404)
     return jsonify({'event': event})
 
 @app.route('/api/v1/event', methods=['POST'])
+@cross_origin()
 def create_event():
     """Get all the events"""
     # return jsonify({'message': 'created event' }), 201
@@ -117,8 +124,11 @@ def create_event():
         # print(toDate(args['enddate']), type(args['enddate']))
         sys.stdout.flush()
         cur.execute("""INSERT INTO events (eventname, description, startdate, enddate, picture) VALUES (%s, %s, %s, %s, %s)""", (args["eventname"], args["description"], toDate(args["startdate"]), toDate(args["enddate"]), args["picture"]))
+        db["connect"].commit()
+        cur.close()
     except Exception as e:
         print(e)
+        cur.close()
 
     return jsonify({'message': 'created user' }), 201
 
@@ -127,20 +137,25 @@ def create_event():
 ########################################################
 
 @app.route('/api/v1/register/<int:event_id>', methods=['GET'])
+@cross_origin()
 def get_registered_users(event_id):
     """ Get registered user given event id"""
     cur = get_cursor()
     cur.execute("select users.userid, users.firstname, users.lastname from users, Register where users.userid = register.userid and eventid = %s", [event_id])
     users = add_descrption(cur.fetchall(), cur.description)
+    cur.close()
     # if len(users) == 0:
     #     abort(404)
     return jsonify({'users': users})
 
 @app.route('/api/v1/register/<int:event_id>/<int:user_id>', methods=['Post'])
+@cross_origin()
 def register_user_to_event(event_id, user_id):
     """ Register user to an event"""
     cur = get_cursor()
     cur.execute("insert into register (userid, eventid) values (%s, %s)", [user_id, event_id])
+    db["connect"].commit()
+    cur.close()
     # if len(users) == 0:
     #     abort(404)
     return jsonify({'message': 'registered user' }), 201
@@ -151,6 +166,7 @@ def register_user_to_event(event_id, user_id):
 ########################################################
 
 @app.route('/api/v1/user', methods=['POST'])
+@cross_origin()
 def create_user():
     """Get all the events"""
     must_haves = ["lastname", "firstname", "email", "password"] 
@@ -163,10 +179,15 @@ def create_user():
     try: 
         print(args['lastname'], args['firstname'], args['email'], args['password'])
         cur.execute("""INSERT INTO users (lastname, firstname, email, password) VALUES (%s, %s, %s, %s)""", (args['lastname'], args['firstname'], args['email'], args['password']))
+        db["connect"].commit()
     except Exception as e:
+        cur.close()
         print(e)
-
+    
+    cur.close()
     return jsonify({'message': 'created user' }), 201
+
+
 
 
 
