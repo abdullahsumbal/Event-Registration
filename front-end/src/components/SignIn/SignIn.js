@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Cookie from "js-cookie";
 
 class SignIn extends Component {
   state = {
@@ -7,8 +8,14 @@ class SignIn extends Component {
     error: ""
   };
 
+  handleErrors = response => {
+    if (!response.ok) throw Error(response.statusText);
+    return response.json();
+  };
+
   logInUser = evt => {
     const data = new FormData(evt.target);
+    console.log(data);
     fetch("http://localhost:5000/api/v1/login", {
       method: "POST",
       body: data
@@ -17,7 +24,8 @@ class SignIn extends Component {
       .then(this.handleErrors)
       // use response of network on fetch Promise resolve
       .then(json => {
-        // TODO: if okay go something
+        alert(json.message);
+        Cookie.set("access-token", json.access_token);
       })
       // handle fetch Promise error
       .catch(error => {
@@ -44,43 +52,41 @@ class SignIn extends Component {
     this.logInUser(evt);
   };
 
-  handleUserChange = evt => {
-    this.setState({
-      email: evt.target.value
-    });
-  };
-
-  handlePassChange = evt => {
-    this.setState({
-      password: evt.target.value
-    });
+  onChange = evt => {
+    /*
+      Because we named the inputs to match their
+      corresponding values in state, it's
+      super easy to update the state
+    */
+    this.setState({ [evt.target.name]: evt.target.value });
   };
 
   render() {
-    // NOTE: I use data-attributes for easier E2E testing
-    // but you don't need to target those (any css-selector will work)
+    const { email, password, error } = this.state;
     return (
       <div>
         <h4>Login</h4>
         <form onSubmit={this.handleSubmit}>
-          {this.state.error && (
+          {error && (
             <h3 data-test="error" onClick={this.dismissError}>
               <button onClick={this.dismissError}>✖</button>
-              {this.state.error}
+              {error}
             </h3>
           )}
           <label>Email </label>
           <input
             type="text"
-            value={this.state.email}
-            onChange={this.handleUserChange}
+            name="email"
+            value={email}
+            onChange={this.onChange}
           />
           <br />
           <label>Password</label>
           <input
             type="password"
-            value={this.state.password}
-            onChange={this.handlePassChange}
+            name="password"
+            value={password}
+            onChange={this.onChange}
           />
 
           <input type="submit" value="Log In" data-test="submit" />

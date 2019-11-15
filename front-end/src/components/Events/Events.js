@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import EventDetails from "../EventDetails/EventDetails";
+import Cookie from "js-cookie";
 
 class Event extends Component {
   state = { showDetails: false };
@@ -15,8 +16,14 @@ class Event extends Component {
   };
 
   registerUser = () => {
-    fetch(this.props.event.uri_register + "/3", {
-      method: "POST"
+    const token = Cookie.get("access-token")
+      ? Cookie.get("access-token")
+      : null;
+    fetch(this.props.event.uri_register, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token
+      }
     })
       // handle network err/success
       .then(this.handleErrors)
@@ -84,7 +91,6 @@ class Events extends Component {
       })
       // handle fetch Promise error
       .catch(error => {
-        console.log(error);
         alert(error.message);
       });
   };
