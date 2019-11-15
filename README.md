@@ -10,7 +10,7 @@ The application allows user to view, create and register for events.
 4. User can not change profile information
 5. User must provide all the info to sign up and same goes for events.
 
-## 6. No styling is better than no styling
+## 6. No styling is better than little styling
 
 ## Components:
 
