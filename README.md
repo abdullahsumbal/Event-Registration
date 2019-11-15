@@ -125,7 +125,7 @@ def service_down(error):
     1. form validation on the backend side
     2. database use models
     3. database migration
-    4.
+    4. There is something called a `reqparse` that can check if all the form data is there
 
 ## Front-End
 
@@ -226,7 +226,8 @@ Header applied to as the parent to every page (component)
 
 #### 7. What can I improve
 
-    1.  add styling
+    1. add styling
+    2. Look at issues on github
 
 ## Error
 

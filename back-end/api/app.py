@@ -114,21 +114,21 @@ def create_event():
     # return jsonify({'message': 'created event' }), 201
     must_haves = ["eventname", "description", "startdate", "enddate", "picture"] 
     cur = get_cursor() 
-    if not request.form or not all(must_have in request.form for must_have in must_haves):
+    if not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves):
         abort(400)
     args = request.form
 
     cur = get_cursor()
     try: 
-        print(args['eventname'], args['description'], args['startdate'], args['enddate'], args['picture'])
-        # print(toDate(args['enddate']), type(args['enddate']))
-        sys.stdout.flush()
         cur.execute("""INSERT INTO events (eventname, description, startdate, enddate, picture) VALUES (%s, %s, %s, %s, %s)""", (args["eventname"], args["description"], toDate(args["startdate"]), toDate(args["enddate"]), args["picture"]))
         db["connect"].commit()
         cur.close()
     except Exception as e:
         print(e)
         cur.close()
+        abort(500)
+    
+    cur.close()
 
     return jsonify({'message': 'created user' }), 201
 
@@ -154,15 +154,21 @@ def register_user_to_event(event_id, user_id):
     """ Register user to an event"""
     cur = get_cursor()
 
-    # make sure user is not already registered for the given event
-    cur.execute("""select userid from register where userid=%s and eventid=%s""",(user_id, event_id,))
-    user = cur.fetchall()
-    if len(user) > 0:
-        return jsonify({'message': 'User already registered' }), 200
+    try:
+        # make sure user is not already registered for the given event
+        cur.execute("""select userid from register where userid=%s and eventid=%s""",(user_id, event_id,))
+        user = cur.fetchall()
+        if len(user) > 0:
+            return jsonify({'message': 'User already registered' }), 200
 
-    cur.execute("insert into register (userid, eventid) values (%s, %s)", [user_id, event_id])
-    db["connect"].commit()
-    cur.close()
+        cur.execute("insert into register (userid, eventid) values (%s, %s)", [user_id, event_id])
+        db["connect"].commit()
+        cur.close()
+    except Exception as e:
+        cur.close()
+        print(e)
+        sys.stdout.flush()
+        abort(500)
 
     # 201 is an HTTP status code for indicating that a specific request is fulfilled, resulting in a new resource being created
     return jsonify({'message': 'User Registered' }), 201
@@ -180,27 +186,28 @@ def create_user():
     cur = get_cursor() 
 
     ## make sure we have all the attributes from the client
-    if not request.form or not all(must_have in request.form for must_have in must_haves):
+    if not request.form or not all(must_have in request.form and request.form[must_have] for must_have in must_haves):
         abort(400)
     args = request.form
     cur = get_cursor()
 
-    # check if email alreday exist. return 200 with a message. 
-    # Can also use 409 for conflict
-    # https://stackoverflow.com/questions/9269040/which-http-response-code-for-this-email-is-already-registered
-    cur.execute("""select email from users where email=%s""",(args['email'],))
-    user = cur.fetchall()
-    if len(user) > 0:
-        return jsonify({'message': 'User already exists' }), 200
-
     try: 
-        # Insert user into database
-        cur.execute("""INSERT INTO users (lastname, firstname, email, password) VALUES (%s, %s, %s, %s)""", (args['lastname'], args['firstname'], args['email'], args['password']))
-        db["connect"].commit()
+        # check if email alreday exist. return 200 with a message. 
+        # Can also use 409 for conflict
+        # https://stackoverflow.com/questions/9269040/which-http-response-code-for-this-email-is-already-registered
+        cur.execute("""select email from users where email=%s""",(args['email'],))
+        user = cur.fetchall()
+        if len(user) > 0:
+            return jsonify({'message': 'User already exists' }), 200
+            # Insert user into database
+            cur.execute("""INSERT INTO users (lastname, firstname, email, password) VALUES (%s, %s, %s, %s)""", (args['lastname'], args['firstname'], args['email'], args['password']))
+            db["connect"].commit()
     except Exception as e:
         cur.close()
         print(e)
         sys.stdout.flush()
+        return abort(500)
+
     
     cur.close()
     return jsonify({'message': 'USer Created' }), 201
